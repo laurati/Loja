@@ -1,6 +1,8 @@
 package models
 
-import "produtos-gin/db"
+import (
+	"produtos-gin/db"
+)
 
 type Produto struct {
 	Id         int     `json:"id"`
@@ -57,4 +59,41 @@ func CriaNovoProduto(nome string, preco float64, quantidade int) {
 
 	insereDadosNoBanco.Exec(nome, preco, quantidade)
 	defer db.Close()
+}
+
+func BuscaProdutoPorId(id1 string) []Produto {
+
+	db := db.ConectaComBancoDeDados()
+	defer db.Close()
+
+	selectProduto, err := db.Query("select * from produtos where id = " + id1)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	prodSelecionado := Produto{}
+
+	prod := []Produto{}
+
+	var id, quantidade int
+	var nome string
+	var preco float64
+
+	for selectProduto.Next() {
+		err = selectProduto.Scan(&id, &nome, &preco, &quantidade)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		prodSelecionado.Id = id
+		prodSelecionado.Nome = nome
+		prodSelecionado.Preco = preco
+		prodSelecionado.Quantidade = quantidade
+
+		prod = append(prod, prodSelecionado)
+	}
+
+	return prod
 }
