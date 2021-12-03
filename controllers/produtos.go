@@ -46,3 +46,25 @@ func InsertProducts(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusCreated, novoProduto)
 }
+
+func Delete(c *gin.Context) {
+
+	idDoProduto := c.Param("id")
+
+	models.DeletaProduto(idDoProduto)
+
+}
+
+func Edit(c *gin.Context) {
+
+	idDoProduto := c.Param("id")
+
+	var novoProduto models.Produto
+
+	if err := c.BindJSON(&novoProduto); err != nil {
+		return
+	}
+
+	models.Update(novoProduto.Nome, novoProduto.Preco, novoProduto.Quantidade, idDoProduto)
+
+}
